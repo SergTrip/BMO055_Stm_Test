@@ -1,7 +1,7 @@
 /**
   ******************************************************************************
   * File Name          : main.c
-  * Date               : 23/05/2015 00:41:39
+  * Date               : 06/06/2015 19:36:42
   * Description        : Main program body
   ******************************************************************************
   *
@@ -34,6 +34,8 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal.h"
+#include "crc.h"
+#include "dma.h"
 #include "i2c.h"
 #include "tim.h"
 #include "usb_device.h"
@@ -43,14 +45,38 @@
 
 /* USER CODE BEGIN 0 */
 
+//------------------------------ Includes -------------------------------------
+// Для работы с устройством USB
 #include "usbd_cdc_if.h"
-
+// Определены адреса регистров сенсора
 // D:\MyPROG\LSD_SLAM\STM\BNO055_driver
 #include "bno055.h"
+// Определены адреса регистров видео камеры
+// D:\MyPROG\STM32\STM32Cube_FW_F4_V1.6.0\Drivers\BSP\Components\ov2640
+//#include "ov2640.h"
 
-void BNO055_Error( void );
+//------------------------------ Defines -------------------------------------
+// Управление питанием видеокамеры
+#define  CAMERA_PWR_EN_PIN		GPIO_PIN_6
+#define  CAMERA_PWR_EN_PORT		GPIOD
+// Зеленый светодиод и сброс камеры
+#define  CAMERA_RST_PIN			  GPIO_PIN_12	
+#define  CAMERA_RST_PORT		  GPIOD
+// Оранжевый сетодиод
+#define  ORANG_LED_PIN		GPIO_PIN_13	
+#define  ORANG_LED_PORT		GPIOD
+// Красный сетодиод
+#define  RED_LED_PIN			GPIO_PIN_14	
+#define  RED_LED_PORT		  GPIOD
+// Синий сетодиод
+#define  BLUE_LED_PIN			GPIO_PIN_14	
+#define  BLUE_LED_PORT		GPIOD
 
-
+// Адресс датчика 
+#define BNO055_DEVICE_ADDRESS 0x28
+// Адресс камеры 
+#define CAMERA_DEVICE_ADDRESS 0x21
+//------------------------------ Globals Variables ----------------------------
 // Массив тестовых данных
 int16_t testDataToSend[] = {0, 0, 0, 0, 0, 0, 0, 0};
 
@@ -63,9 +89,19 @@ HAL_I2C_StateTypeDef i2cState;
 
 uint32_t i2cError;
 
-#define BNO055_DEVICE_ADDRESS 0x28
+
 
 uint16_t devAddress; 
+
+uint32_t 						dcmiError = 0;
+HAL_StatusTypeDef		dcmiStatus; 
+
+uint16_t imageBuffer[1280]; 
+uint16_t lineCounter = 0;
+
+//------------------------- Private function prototypes ------------------------
+// Обработка ошибок датчика
+void BNO055_Error( void );
 	
 /* USER CODE END 0 */
 
@@ -89,16 +125,25 @@ int main(void)
 
   /* System interrupt init*/
   /* Sets the priority grouping field */
-  HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_0);
+  HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_2);
   HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_I2C3_Init();
+  MX_DMA_Init();
+  MX_CRC_Init();
+  MX_I2C1_Init();
   MX_TIM7_Init();
   MX_USB_DEVICE_Init();
 
   /* USER CODE BEGIN 2 */
+		/*Reset camera*/
+  HAL_GPIO_WritePin(CAMERA_RST_PORT, CAMERA_RST_PIN, GPIO_PIN_RESET);
+  HAL_Delay(100);
+  HAL_GPIO_WritePin(CAMERA_RST_PORT, CAMERA_RST_PIN, GPIO_PIN_SET);
+	
+	/* camera PWR EN pin configuration */
+  HAL_GPIO_WritePin(CAMERA_PWR_EN_PORT, CAMERA_PWR_EN_PIN, GPIO_PIN_RESET);
 	
 	// Включить перефирию		
 	devAddress = BNO055_DEVICE_ADDRESS; 
@@ -106,22 +151,9 @@ int main(void)
 	testDataToSend[0] = 0xAA;
 	
 	// Попробовать запустить акселерометр
-	// i2cRes = HAL_I2C_IsDeviceReady( &hi2c3, devAddress, 5, 1000 );
-	
-//	HAL_GPIO_WritePin ( GPIOC, GPIO_PIN_9, GPIO_PIN_RESET );	
-//	HAL_GPIO_WritePin ( GPIOA, GPIO_PIN_8, GPIO_PIN_RESET );
-//	
-		__I2C3_CLK_DISABLE();
-		
-		HAL_Delay(1000);	
-		
-		__I2C3_CLK_ENABLE();
-//	
-//	HAL_GPIO_WritePin ( GPIOC, GPIO_PIN_9, GPIO_PIN_SET );
-//	HAL_GPIO_WritePin ( GPIOA, GPIO_PIN_8, GPIO_PIN_SET );   
+	// i2cRes = HAL_I2C_IsDeviceReady( &hi2c3, (uint16_t)BNO055_I2C_ADDR1<<1, 5, 1000 );
 
-	
-	i2cState = HAL_I2C_GetState(&hi2c3);
+	i2cState = HAL_I2C_GetState(&hi2c1);
 	
 	if( HAL_I2C_STATE_READY != i2cState )
 	{
@@ -129,26 +161,74 @@ int main(void)
 		while(1) {}
 	}
 	
-	// Пробуем читать ID устройства
-	// i2cRes = HAL_I2C_Master_Receive ( &hi2c3, (uint16_t)BNO055_I2C_ADDR1<<1, (uint8_t*)testDataToSend, 1, 1000 );
-	uint16_t reg = 0x01;
-	i2cRes = HAL_I2C_Mem_Read ( 					&hi2c3, 
+	// Пробуем читать ID устройства ( Это рабочая фукция !!! ) *********************************
+	i2cRes = HAL_I2C_Mem_Read ( 					&hi2c1, 
 															(uint16_t)BNO055_I2C_ADDR1<<1,		// Адрес устройства
 																				0x2, 										// Адрес регистра
 																				I2C_MEMADD_SIZE_8BIT,		// Размерность данных
 																				IDData, 								// Буфер для получения данных
 																				4, 											// Сколько данных нужно получить
 																				100);
+	//********************************************************************************************
+	
+//	i2cRes = HAL_I2C_Mem_Read_DMA ( 					&hi2c1, 
+//															(uint16_t)BNO055_I2C_ADDR1<<1,		// Адрес устройства
+//																				0x2, 										// Адрес регистра
+//																				I2C_MEMADD_SIZE_8BIT,		// Размерность данных
+//																				IDData, 								// Буфер для получения данных
+//																				4 	);									// Сколько данных нужно получить
+																				
 	
 	if( HAL_OK != i2cRes )
 	{
-		BNO055_Error();
+		while(1){}
+		// BNO055_Error();
 	}
 	
+	while( HAL_I2C_STATE_READY != HAL_I2C_GetState ( &hi2c1 ))
+	{
+		
+	}
+	
+	//while(1){}
+	
+	// ******************* Попытки работы с камерой ***********************************************
+	// Пробуем прочитать номер камеры
+//	i2cRes = HAL_I2C_Mem_Read ( 				&hi2c1, 
+//														(uint16_t)CAMERA_DEVICE_ADDRESS,  // Адрес устройства
+//																			0x0A, 									// Адрес регистра
+//																			I2C_MEMADD_SIZE_8BIT,		// Размерность данных
+//																			IDData, 								// Буфер для получения данных
+//																			1, 											// Сколько данных нужно получить
+//																			100);
+	
+	//uint8_t Data = 0x0A;
+//	i2cRes = HAL_I2C_Mem_Write_DMA ( 			&hi2c1, 
+//															(uint16_t)0x43,												// Адрес устройства
+//																				0x0A, 											// Адрес регистра
+//																				I2C_MEMADD_SIZE_8BIT,				// Размерность данных
+//																				IDData, 										// Буфер для получения данных
+//																				2 	);											// Сколько данных нужно получить
 
+//	
+//	if( HAL_OK != i2cRes )
+//	{
+//		while(1){}
+//		// BNO055_Error();
+//	}
+//	
+//	while( HAL_I2C_STATE_READY != HAL_I2C_GetState ( &hi2c1 ))
+//	{
+//		
+//	}
+//	
+//	while(1){}
+	
+	//*********************************************************************************************
+	
 	IDData[0] = OPERATION_MODE_NDOF;
 	// Пробуем поменять режим устройства	
-	i2cRes = HAL_I2C_Mem_Write( 					&hi2c3, 
+	i2cRes = HAL_I2C_Mem_Write( 					&hi2c1, 
 															(uint16_t)BNO055_I2C_ADDR1<<1,		// Адрес устройства
 																				0x3D, 									// Адрес регистра
 																				I2C_MEMADD_SIZE_8BIT, 	// Размерность данных
@@ -162,28 +242,28 @@ int main(void)
 	}
 	
 	// Дадим время на переключение
-	HAL_Delay(3000);
+	//  HAL_Delay(3000);
 	
-/*
+
 	// Пробуем поменять режим устройства	
-	i2cRes = HAL_I2C_Mem_Read( 					&hi2c3, 
-															(uint16_t)BNO055_I2C_ADDR1<<1,		// Адрес устройства
-																				BNO055_OPR_MODE_ADDR, 	// Адрес регистра
-																				8, 											// Размерность данных
-																				&IDData[1], 						// Буфер для получения данных
-																				1, 											// Сколько данных нужно отправить
-																				1000);
+//	i2cRes = HAL_I2C_Mem_Read( 					&hi2c3, 
+//															(uint16_t)BNO055_I2C_ADDR1<<1,		// Адрес устройства
+//																				BNO055_OPR_MODE_ADDR, 	// Адрес регистра
+//																				8, 											// Размерность данных
+//																				&IDData[1], 						// Буфер для получения данных
+//																				1, 											// Сколько данных нужно отправить
+//																				1000);
+//	
+//	if( HAL_OK != i2cRes )
+//	{
+//		BNO055_Error();
+//	}
 	
-	if( HAL_OK != i2cRes )
-	{
-		BNO055_Error();
-	}
-	*/
 	// BNO055_GRAVITY_DATA_X_LSB_ADDR
 	// BNO055_QUATERNION_DATA_W_LSB_ADDR
 	
 		// Пробуем читать ID устройства
-		i2cRes = HAL_I2C_Mem_Read ( 				&hi2c3, 
+		i2cRes = HAL_I2C_Mem_Read ( 				&hi2c1, 
 															(uint16_t)BNO055_I2C_ADDR1<<1,									// Адрес устройства
 															(uint16_t)BNO055_GRAVITY_DATA_X_LSB_ADDR, 			// Адрес регистра
 																				I2C_MEMADD_SIZE_8BIT, 								// Размерность данных
@@ -196,11 +276,13 @@ int main(void)
 		BNO055_Error();
 	}
 	
+	
+	
+	
 	// Запустить таймер
 	HAL_TIM_Base_Start_IT( &htim7 );
 
   /* USER CODE END 2 */
-	
 
   /* USER CODE BEGIN 3 */
   /* Infinite loop */
@@ -256,7 +338,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	// BSP_ACCELERO_GetXYZ( (testDataToSend+1) );
 	
 	// Пробуем читать ID устройства
-		i2cRes = HAL_I2C_Mem_Read ( 				&hi2c3, 
+		i2cRes = HAL_I2C_Mem_Read ( 				&hi2c1, 
 															(uint16_t)BNO055_I2C_ADDR1<<1,									// Адрес устройства
 															(uint16_t)BNO055_QUATERNION_DATA_W_LSB_ADDR, 		// Адрес регистра
 																				I2C_MEMADD_SIZE_8BIT, 								// Размерность данных
@@ -268,13 +350,13 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	{
 		{	
 		// Уходим в бесконечный цикл
-		i2cError = HAL_I2C_GetError ( &hi2c3 );
+		i2cError = HAL_I2C_GetError ( &hi2c1 );
 		while(1){}
 }
 	}
 	
 		// Пробуем читать ID устройства
-		i2cRes = HAL_I2C_Mem_Read ( 				&hi2c3, 
+		i2cRes = HAL_I2C_Mem_Read ( 				&hi2c1, 
 															(uint16_t)BNO055_I2C_ADDR1<<1,									// Адрес устройства
 															(uint16_t)BNO055_LINEAR_ACCEL_DATA_X_LSB_ADDR,	// Адрес регистра
 																				I2C_MEMADD_SIZE_8BIT, 								// Размерность данных
@@ -286,7 +368,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	{
 		{	
 		// Уходим в бесконечный цикл
-		i2cError = HAL_I2C_GetError ( &hi2c3 );
+		i2cError = HAL_I2C_GetError ( &hi2c1 );
 		while(1){}
 }
 	}
@@ -298,8 +380,20 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 void BNO055_Error()
 {	
 	// Уходим в бесконечный цикл
-	i2cError = HAL_I2C_GetError ( &hi2c3 );
+	i2cError = HAL_I2C_GetError ( &hi2c1 );
 	while(1){}
+}
+
+// Прерывание по окончантю передачи
+void HAL_I2C_MemTxCpltCallback ( I2C_HandleTypeDef *hi2c )
+{
+
+}
+
+// Прерывание по окончантю приема
+void HAL_I2C_MemRxCpltCallback ( I2C_HandleTypeDef *hi2c )
+{
+
 }
 
 /* USER CODE END 4 */

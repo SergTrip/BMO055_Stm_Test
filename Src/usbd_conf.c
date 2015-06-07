@@ -1,7 +1,7 @@
 /**
   ******************************************************************************
   * @file           : usbd_conf.c
-  * @date           : 23/05/2015 00:41:34   
+  * @date           : 06/06/2015 19:36:41   
   * @version        : v1.0_Cube
   * @brief          : This file implements the board support package for the USB device library
   ******************************************************************************
@@ -72,7 +72,7 @@ void HAL_PCD_MspInit(PCD_HandleTypeDef* hpcd)
 
     /* Peripheral interrupt init*/
     /* Sets the priority grouping field */
-    HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_0);
+    HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_2);
     HAL_NVIC_SetPriority(OTG_FS_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(OTG_FS_IRQn);
   }

@@ -1,9 +1,9 @@
 /**
   ******************************************************************************
-  * File Name          : gpio.c
-  * Date               : 06/06/2015 19:36:40
+  * File Name          : dma.c
+  * Date               : 06/06/2015 19:36:41
   * Description        : This file provides code for the configuration
-  *                      of all used GPIO pins.
+  *                      of all the requested memory to memory DMA transfers.
   ******************************************************************************
   *
   * COPYRIGHT(c) 2015 STMicroelectronics
@@ -32,45 +32,42 @@
   *
   ******************************************************************************
   */
-
 /* Includes ------------------------------------------------------------------*/
-#include "gpio.h"
+#include "dma.h"
+
 /* USER CODE BEGIN 0 */
 
 /* USER CODE END 0 */
 
 /*----------------------------------------------------------------------------*/
-/* Configure GPIO                                                             */
+/* Configure DMA                                                              */
 /*----------------------------------------------------------------------------*/
+
 /* USER CODE BEGIN 1 */
 
 /* USER CODE END 1 */
 
-/** Configure pins as 
-        * Analog 
-        * Input 
-        * Output
-        * EVENT_OUT
-        * EXTI
-*/
-void MX_GPIO_Init(void)
+/** 
+  * Enable DMA controller clock
+  */
+void MX_DMA_Init(void) 
 {
+  /* DMA controller clock enable */
+  __DMA1_CLK_ENABLE();
 
-  GPIO_InitTypeDef GPIO_InitStruct;
-
-  /* GPIO Ports Clock Enable */
-  __GPIOD_CLK_ENABLE();
-  __GPIOA_CLK_ENABLE();
-  __GPIOB_CLK_ENABLE();
-
-  /*Configure GPIO pins : PD12 PD13 PD14 PD15 
-                           PD6 */
-  GPIO_InitStruct.Pin = GPIO_PIN_12|GPIO_PIN_13|GPIO_PIN_14|GPIO_PIN_15 
-                          |GPIO_PIN_6;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FAST;
-  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+  /* DMA interrupt init */
+  /* Sets the priority grouping field */
+  HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_2);
+  HAL_NVIC_SetPriority(DMA2_Stream1_IRQn, 2, 0);
+  HAL_NVIC_EnableIRQ(DMA2_Stream1_IRQn);
+  /* Sets the priority grouping field */
+  HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_2);
+  HAL_NVIC_SetPriority(DMA1_Stream6_IRQn, 2, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Stream6_IRQn);
+  /* Sets the priority grouping field */
+  HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_2);
+  HAL_NVIC_SetPriority(DMA1_Stream0_IRQn, 2, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Stream0_IRQn);
 
 }
 

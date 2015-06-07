@@ -1,5 +1,4 @@
 --cpu Cortex-M4.fp
-"bmo055sensortest configuration\startup_stm32f407xx.o"
 "bmo055sensortest configuration\gpio.o"
 "bmo055sensortest configuration\i2c.o"
 "bmo055sensortest configuration\main.o"
@@ -9,6 +8,8 @@
 "bmo055sensortest configuration\usbd_cdc_if.o"
 "bmo055sensortest configuration\usbd_conf.o"
 "bmo055sensortest configuration\usbd_desc.o"
+"bmo055sensortest configuration\crc.o"
+"bmo055sensortest configuration\dma.o"
 "bmo055sensortest configuration\system_stm32f4xx.o"
 "bmo055sensortest configuration\stm32f4xx_hal.o"
 "bmo055sensortest configuration\stm32f4xx_hal_cortex.o"
@@ -29,10 +30,12 @@
 "bmo055sensortest configuration\stm32f4xx_hal_tim.o"
 "bmo055sensortest configuration\stm32f4xx_hal_tim_ex.o"
 "bmo055sensortest configuration\stm32f4xx_ll_usb.o"
+"bmo055sensortest configuration\stm32f4xx_hal_crc.o"
 "bmo055sensortest configuration\usbd_cdc.o"
 "bmo055sensortest configuration\usbd_core.o"
 "bmo055sensortest configuration\usbd_ctlreq.o"
 "bmo055sensortest configuration\usbd_ioreq.o"
+"bmo055sensortest configuration\startup_stm32f407xx.o"
 --library_type=microlib --strict --scatter "BMO055SensorTest Configuration\BMO055SensorTest Configuration.sct"
 
 --diag_suppress=L6329 --summary_stderr --info summarysizes --map --xref --callgraph --symbols

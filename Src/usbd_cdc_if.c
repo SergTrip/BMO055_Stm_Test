@@ -60,8 +60,8 @@
   /* USER CODE BEGIN 1 */
 /* Define size for the receive and transmit buffer over CDC */
 /* It's up to user to redefine and/or remove those define */
-#define APP_RX_DATA_SIZE  512
-#define APP_TX_DATA_SIZE  512
+#define APP_RX_DATA_SIZE  64
+#define APP_TX_DATA_SIZE  64
   /* USER CODE END 1 */  
 /**
   * @}

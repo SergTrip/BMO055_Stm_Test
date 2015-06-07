@@ -1,7 +1,7 @@
 /**
   ******************************************************************************
   * @file    stm32f4xx_it.c
-  * @date    23/05/2015 00:41:38
+  * @date    06/06/2015 19:36:42
   * @brief   Interrupt Service Routines.
   ******************************************************************************
   *
@@ -39,7 +39,9 @@
 /* External variables --------------------------------------------------------*/
 
 extern PCD_HandleTypeDef hpcd_USB_OTG_FS;
-extern I2C_HandleTypeDef hi2c3;
+extern DMA_HandleTypeDef hdma_i2c1_tx;
+extern DMA_HandleTypeDef hdma_i2c1_rx;
+extern I2C_HandleTypeDef hi2c1;
 extern TIM_HandleTypeDef htim7;
 
 /******************************************************************************/
@@ -65,12 +67,12 @@ void SysTick_Handler(void)
 }
 
 /**
-* @brief This function handles I2C3 event interrupt.
+* @brief This function handles I2C1 event interrupt.
 */
-void I2C3_EV_IRQHandler(void)
+void I2C1_EV_IRQHandler(void)
 {
-  HAL_NVIC_ClearPendingIRQ(I2C3_EV_IRQn);
-  HAL_I2C_EV_IRQHandler(&hi2c3);
+  HAL_NVIC_ClearPendingIRQ(I2C1_EV_IRQn);
+  HAL_I2C_EV_IRQHandler(&hi2c1);
 }
 
 /**
@@ -83,12 +85,39 @@ void OTG_FS_IRQHandler(void)
 }
 
 /**
-* @brief This function handles I2C3 error interrupt.
+* @brief This function handles DMA2 Stream1 global interrupt.
 */
-void I2C3_ER_IRQHandler(void)
+void DMA2_Stream1_IRQHandler(void)
 {
-  HAL_NVIC_ClearPendingIRQ(I2C3_ER_IRQn);
-  HAL_I2C_ER_IRQHandler(&hi2c3);
+  HAL_NVIC_ClearPendingIRQ(DMA2_Stream1_IRQn);
+  
+}
+
+/**
+* @brief This function handles DMA1 Stream6 global interrupt.
+*/
+void DMA1_Stream6_IRQHandler(void)
+{
+  HAL_NVIC_ClearPendingIRQ(DMA1_Stream6_IRQn);
+  HAL_DMA_IRQHandler(&hdma_i2c1_tx);
+}
+
+/**
+* @brief This function handles DMA1 Stream0 global interrupt.
+*/
+void DMA1_Stream0_IRQHandler(void)
+{
+  HAL_NVIC_ClearPendingIRQ(DMA1_Stream0_IRQn);
+  HAL_DMA_IRQHandler(&hdma_i2c1_rx);
+}
+
+/**
+* @brief This function handles I2C1 error interrupt.
+*/
+void I2C1_ER_IRQHandler(void)
+{
+  HAL_NVIC_ClearPendingIRQ(I2C1_ER_IRQn);
+  HAL_I2C_ER_IRQHandler(&hi2c1);
 }
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

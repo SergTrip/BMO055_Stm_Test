@@ -1,9 +1,9 @@
 /**
   ******************************************************************************
-  * File Name          : gpio.c
+  * File Name          : CRC.c
   * Date               : 06/06/2015 19:36:40
   * Description        : This file provides code for the configuration
-  *                      of all used GPIO pins.
+  *                      of the CRC instances.
   ******************************************************************************
   *
   * COPYRIGHT(c) 2015 STMicroelectronics
@@ -34,49 +34,42 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
-#include "gpio.h"
+#include "crc.h"
+
 /* USER CODE BEGIN 0 */
 
 /* USER CODE END 0 */
 
-/*----------------------------------------------------------------------------*/
-/* Configure GPIO                                                             */
-/*----------------------------------------------------------------------------*/
-/* USER CODE BEGIN 1 */
+CRC_HandleTypeDef hcrc;
 
-/* USER CODE END 1 */
-
-/** Configure pins as 
-        * Analog 
-        * Input 
-        * Output
-        * EVENT_OUT
-        * EXTI
-*/
-void MX_GPIO_Init(void)
+/* CRC init function */
+void MX_CRC_Init(void)
 {
 
-  GPIO_InitTypeDef GPIO_InitStruct;
-
-  /* GPIO Ports Clock Enable */
-  __GPIOD_CLK_ENABLE();
-  __GPIOA_CLK_ENABLE();
-  __GPIOB_CLK_ENABLE();
-
-  /*Configure GPIO pins : PD12 PD13 PD14 PD15 
-                           PD6 */
-  GPIO_InitStruct.Pin = GPIO_PIN_12|GPIO_PIN_13|GPIO_PIN_14|GPIO_PIN_15 
-                          |GPIO_PIN_6;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FAST;
-  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+  hcrc.Instance = CRC;
+  HAL_CRC_Init(&hcrc);
 
 }
 
-/* USER CODE BEGIN 2 */
+void HAL_CRC_MspInit(CRC_HandleTypeDef* hcrc)
+{
 
-/* USER CODE END 2 */
+  if(hcrc->Instance==CRC)
+  {
+    /* Peripheral clock enable */
+    __CRC_CLK_ENABLE();
+  }
+}
+
+void HAL_CRC_MspDeInit(CRC_HandleTypeDef* hcrc)
+{
+
+  if(hcrc->Instance==CRC)
+  {
+    /* Peripheral clock disable */
+    __CRC_CLK_DISABLE();
+  }
+} 
 
 /**
   * @}

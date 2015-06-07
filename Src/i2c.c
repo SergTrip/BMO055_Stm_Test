@@ -1,7 +1,7 @@
 /**
   ******************************************************************************
   * File Name          : I2C.c
-  * Date               : 23/05/2015 00:41:32
+  * Date               : 06/06/2015 19:36:41
   * Description        : This file provides code for the configuration
   *                      of the I2C instances.
   ******************************************************************************
@@ -37,27 +37,30 @@
 #include "i2c.h"
 
 #include "gpio.h"
+#include "dma.h"
 
 /* USER CODE BEGIN 0 */
 
 /* USER CODE END 0 */
 
-I2C_HandleTypeDef hi2c3;
+I2C_HandleTypeDef hi2c1;
+DMA_HandleTypeDef hdma_i2c1_tx;
+DMA_HandleTypeDef hdma_i2c1_rx;
 
-/* I2C3 init function */
-void MX_I2C3_Init(void)
+/* I2C1 init function */
+void MX_I2C1_Init(void)
 {
 
-  hi2c3.Instance = I2C3;
-  hi2c3.Init.ClockSpeed = 100000;
-  hi2c3.Init.DutyCycle = I2C_DUTYCYCLE_2;
-  hi2c3.Init.OwnAddress1 = 15;
-  hi2c3.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
-  hi2c3.Init.DualAddressMode = I2C_DUALADDRESS_DISABLED;
-  hi2c3.Init.OwnAddress2 = 0;
-  hi2c3.Init.GeneralCallMode = I2C_GENERALCALL_DISABLED;
-  hi2c3.Init.NoStretchMode = I2C_NOSTRETCH_DISABLED;
-  HAL_I2C_Init(&hi2c3);
+  hi2c1.Instance = I2C1;
+  hi2c1.Init.ClockSpeed = 100000;
+  hi2c1.Init.DutyCycle = I2C_DUTYCYCLE_2;
+  hi2c1.Init.OwnAddress1 = 0;
+  hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+  hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLED;
+  hi2c1.Init.OwnAddress2 = 0;
+  hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLED;
+  hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLED;
+  HAL_I2C_Init(&hi2c1);
 
 }
 
@@ -65,64 +68,86 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef* hi2c)
 {
 
   GPIO_InitTypeDef GPIO_InitStruct;
-  if(hi2c->Instance==I2C3)
+  if(hi2c->Instance==I2C1)
   {
-	/* Peripheral clock enable */
-    //__I2C3_CLK_ENABLE();
   
-    /**I2C3 GPIO Configuration    
-    PC9     ------> I2C3_SDA
-    PA8     ------> I2C3_SCL 
+    /**I2C1 GPIO Configuration    
+    PB8     ------> I2C1_SCL
+    PB9     ------> I2C1_SDA 
     */
-    GPIO_InitStruct.Pin = GPIO_PIN_9;
+    GPIO_InitStruct.Pin = GPIO_PIN_8|GPIO_PIN_9;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
     GPIO_InitStruct.Pull = GPIO_PULLUP;
     GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
-    GPIO_InitStruct.Alternate = GPIO_AF4_I2C3;
-    HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+    GPIO_InitStruct.Alternate = GPIO_AF4_I2C1;
+    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-    GPIO_InitStruct.Pin = GPIO_PIN_8;
-    GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
-    GPIO_InitStruct.Pull = GPIO_PULLUP;
-    GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
-    GPIO_InitStruct.Alternate = GPIO_AF4_I2C3;
-    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+    /* Peripheral DMA init*/
+  
+    hdma_i2c1_tx.Instance = DMA1_Stream6;
+    hdma_i2c1_tx.Init.Channel = DMA_CHANNEL_1;
+    hdma_i2c1_tx.Init.Direction = DMA_MEMORY_TO_PERIPH;
+    hdma_i2c1_tx.Init.PeriphInc = DMA_PINC_DISABLE;
+    hdma_i2c1_tx.Init.MemInc = DMA_MINC_DISABLE;
+    hdma_i2c1_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+    hdma_i2c1_tx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
+    hdma_i2c1_tx.Init.Mode = DMA_NORMAL;
+    hdma_i2c1_tx.Init.Priority = DMA_PRIORITY_HIGH;
+    hdma_i2c1_tx.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
+    HAL_DMA_Init(&hdma_i2c1_tx);
+
+    __HAL_LINKDMA(hi2c,hdmatx,hdma_i2c1_tx);
+
+    hdma_i2c1_rx.Instance = DMA1_Stream0;
+    hdma_i2c1_rx.Init.Channel = DMA_CHANNEL_1;
+    hdma_i2c1_rx.Init.Direction = DMA_PERIPH_TO_MEMORY;
+    hdma_i2c1_rx.Init.PeriphInc = DMA_PINC_DISABLE;
+    hdma_i2c1_rx.Init.MemInc = DMA_MINC_ENABLE;
+    hdma_i2c1_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+    hdma_i2c1_rx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
+    hdma_i2c1_rx.Init.Mode = DMA_NORMAL;
+    hdma_i2c1_rx.Init.Priority = DMA_PRIORITY_HIGH;
+    hdma_i2c1_rx.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
+    HAL_DMA_Init(&hdma_i2c1_rx);
+
+    __HAL_LINKDMA(hi2c,hdmarx,hdma_i2c1_rx);
 
     /* Peripheral interrupt init*/
     /* Sets the priority grouping field */
-    HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_0);
-    HAL_NVIC_SetPriority(I2C3_EV_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(I2C3_EV_IRQn);
+    HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_2);
+    HAL_NVIC_SetPriority(I2C1_EV_IRQn, 3, 0);
+    HAL_NVIC_EnableIRQ(I2C1_EV_IRQn);
     /* Sets the priority grouping field */
-    HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_0);
-    HAL_NVIC_SetPriority(I2C3_ER_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(I2C3_ER_IRQn);
-		
+    HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_2);
+    HAL_NVIC_SetPriority(I2C1_ER_IRQn, 3, 0);
+    HAL_NVIC_EnableIRQ(I2C1_ER_IRQn);		
 		
     /* Peripheral clock enable */
-    __I2C3_CLK_ENABLE();
+    __I2C1_CLK_ENABLE();
   }
 }
 
 void HAL_I2C_MspDeInit(I2C_HandleTypeDef* hi2c)
 {
 
-  if(hi2c->Instance==I2C3)
+  if(hi2c->Instance==I2C1)
   {
     /* Peripheral clock disable */
-    __I2C3_CLK_DISABLE();
+    __I2C1_CLK_DISABLE();
   
-    /**I2C3 GPIO Configuration    
-    PC9     ------> I2C3_SDA
-    PA8     ------> I2C3_SCL 
+    /**I2C1 GPIO Configuration    
+    PB8     ------> I2C1_SCL
+    PB9     ------> I2C1_SDA 
     */
-    HAL_GPIO_DeInit(GPIOC, GPIO_PIN_9);
+    HAL_GPIO_DeInit(GPIOB, GPIO_PIN_8|GPIO_PIN_9);
 
-    HAL_GPIO_DeInit(GPIOA, GPIO_PIN_8);
+    /* Peripheral DMA DeInit*/
+    HAL_DMA_DeInit(hi2c->hdmatx);
+    HAL_DMA_DeInit(hi2c->hdmarx);
 
     /* Peripheral interrupt Deinit*/
-    HAL_NVIC_DisableIRQ(I2C3_EV_IRQn);
-    HAL_NVIC_DisableIRQ(I2C3_ER_IRQn);
+    HAL_NVIC_DisableIRQ(I2C1_EV_IRQn);
+    HAL_NVIC_DisableIRQ(I2C1_ER_IRQn);
   }
 } 
 

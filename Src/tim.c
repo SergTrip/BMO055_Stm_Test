@@ -1,7 +1,7 @@
 /**
   ******************************************************************************
   * File Name          : TIM.c
-  * Date               : 23/05/2015 00:41:33
+  * Date               : 06/06/2015 19:36:41
   * Description        : This file provides code for the configuration
   *                      of the TIM instances.
   ******************************************************************************
@@ -49,9 +49,9 @@ void MX_TIM7_Init(void)
   TIM_MasterConfigTypeDef sMasterConfig;
 
   htim7.Instance = TIM7;
-  htim7.Init.Prescaler = 69;
+  htim7.Init.Prescaler = 671;
   htim7.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim7.Init.Period = 60000;
+  htim7.Init.Period = 62499;
   HAL_TIM_Base_Init(&htim7);
 
   sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
@@ -70,7 +70,7 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* htim_base)
 
     /* Peripheral interrupt init*/
     /* Sets the priority grouping field */
-    HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_0);
+    HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_2);
     HAL_NVIC_SetPriority(TIM7_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(TIM7_IRQn);
   }
