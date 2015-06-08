@@ -8,77 +8,86 @@ Project File Date:  06/06/2015
 
 <h2>Output:</h2>
 Build target 'BMO055SensorTest Configuration'
-compiling tim.c...
+compiling main.c...
+..\..\Src\main.c(322): warning:  #111-D: statement is unreachable
+                BNO055_Error();         
+..\..\Src\main.c(334): warning:  #111-D: statement is unreachable
+                BNO055_Error();                         
+..\..\Src\main.c(366): warning:  #111-D: statement is unreachable
+                BNO055_Error();
+..\..\Src\main.c(394): warning:  #111-D: statement is unreachable
+                BNO055_Error();
+..\..\Src\main.c(420): warning:  #111-D: statement is unreachable
+                BNO055_Error();
+..\..\Src\main.c(431): warning:  #177-D: variable "res" was declared but never referenced
+        int8_t res;     
+..\..\Src\main.c: 6 warnings, 0 errors
 linking...
-Program Size: Code=19088 RO-data=440 RW-data=400 ZI-data=4472  
-"BMO055SensorTest Configuration\BMO055SensorTest Configuration.axf" - 0 Error(s), 0 Warning(s).
-Load "BMO055SensorTest Configuration\\BMO055SensorTest Configuration.axf" 
+Program Size: Code=19284 RO-data=440 RW-data=404 ZI-data=4484  
+"BMO055SensorTest Configuration\BMO055SensorTest Configuration.axf" - 0 Error(s), 6 Warning(s).
+t Configuration.axf" - 1 Error(s), 6 Warning(s).
+Target not created
+xf" 
 Erase Done.
 Programming Done.
 Verify OK.
-
-not created
-elled
-Load "BMO055SensorTest Configuration\\BMO055SensorTest Configuration.axf" 
-Erase Done.
-Programming Done.
-Verify OK.
-), 2 Warning(s).
-entifier "DCMI_MODE_CONTINUOUS" is undefined
-        dcmiStatus = HAL_DCMI_Start_DMA ( &hdcmi, DCMI_MODE_CONTINUOUS, (uint32_t)imageBuffer, (1280) );
-..\..\Src\main.c(247): warning:  #188-D: enumerated type mixed with another type
-        dcmiStatus = HAL_DCMI_Start_DMA ( &hdcmi, DCMI_MODE_CONTINUOUS, (uint32_t)imageBuffer, (1280) );
-..\..\Src\main.c(359): warning:  #177-D: variable "test" was declared but never referenced
-        uint8_t test = 1;
-..\..\Src\main.c(365): warning:  #177-D: variable "test" was declared but never referenced
-        uint8_t test = 1;
-..\..\Src\main.c: 4 warnings, 2 errors
-"BMO055SensorTest Configuration\BMO055SensorTest Configuration.axf" - 2 Error(s), 4 Warning(s).
+..\..\Src\main.c(391): error:  #137: expression must be a modifiable lvalue
+        moduleState = WaitData;
+..\..\Src\main.c(405): warning:  #111-D: statement is unreachable
+                BNO055_Error();
+..\..\Src\main.c(408): error:  #137: expression must be a modifiable lvalue
+        moduleState = RecieveData;
+..\..\Src\main.c(418): error:  #70: incomplete type is not allowed
+        switch ( moduleState )
+..\..\Src\main.c(426): error:  #137: expression must be a modifiable lvalue
+                        moduleState = Idl;
+..\..\Src\main.c(434): error:  #137: expression must be a modifiable lvalue
+                        moduleState = Idl;
+..\..\Src\main.c(440): error:  #137: expression must be a modifiable lvalue
+                        moduleState = Idl;
+..\..\Src\main.c(416): warning:  #177-D: variable "res" was declared but never referenced
+        int8_t res;     
+..\..\Src\main.c(104): error:  #235: variable "moduleState" was declared with a never-completed type
+  enum bno055ModuleState moduleState;
+..\..\Src\main.c: 6 warnings, 12 errors
+"BMO055SensorTest Configuration\BMO055SensorTest Configuration.axf" - 12 Error(s), 6 Warning(s).
 Target not created
-376): warning:  #223-D: function "HAL_DCMI_GetError" declared implicitly
-        dcmiError = HAL_DCMI_GetError ( hdcmi );
-..\..\Src\main.c(387): error:  #20: identifier "DCMI_HandleTypeDef" is undefined
-  void HAL_DCMI_LineEventCallback(DCMI_HandleTypeDef *hdcmi)
-..\..\Src\main.c(399): error:  #20: identifier "DCMI_HandleTypeDef" is undefined
-  void HAL_DCMI_VsyncEventCallback(DCMI_HandleTypeDef *hdcmi)
-..\..\Src\main.c(410): error:  #20: identifier "DCMI_HandleTypeDef" is undefined
-  void HAL_DCMI_FrameEventCallback(DCMI_HandleTypeDef *hdcmi)
-..\..\Src\main.c(413): warning:  #177-D: variable "test" was declared but never referenced
-        uint8_t test;
-..\..\Src\main.c: 6 warnings, 6 errors
-compiling stm32f4xx_it.c...
-compiling tim.c...
-compiling usb_device.c...
-compiling usbd_cdc_if.c...
-compiling usbd_conf.c...
-compiling usbd_desc.c...
-compiling crc.c...
-compiling dma.c...
-compiling system_stm32f4xx.c...
-compiling stm32f4xx_hal.c...
-compiling stm32f4xx_hal_cortex.c...
-compiling stm32f4xx_hal_dma.c...
-compiling stm32f4xx_hal_dma_ex.c...
-compiling stm32f4xx_hal_flash.c...
-compiling stm32f4xx_hal_flash_ex.c...
-compiling stm32f4xx_hal_flash_ramfunc.c...
-compiling stm32f4xx_hal_gpio.c...
-compiling stm32f4xx_hal_i2c.c...
-compiling stm32f4xx_hal_i2c_ex.c...
-compiling stm32f4xx_hal_pcd.c...
-compiling stm32f4xx_hal_pcd_ex.c...
-compiling stm32f4xx_hal_pwr.c...
-compiling stm32f4xx_hal_pwr_ex.c...
-compiling stm32f4xx_hal_rcc.c...
-compiling stm32f4xx_hal_rcc_ex.c...
-compiling stm32f4xx_hal_tim.c...
-compiling stm32f4xx_hal_tim_ex.c...
-compiling stm32f4xx_ll_usb.c...
-compiling stm32f4xx_hal_crc.c...
-compiling usbd_cdc.c...
-compiling usbd_core.c...
-compiling usbd_ctlreq.c...
-compiling usbd_ioreq.c...
-assembling startup_stm32f407xx.s...
-"BMO055SensorTest Configuration\BMO055SensorTest Configuration.axf" - 6 Error(s), 6 Warning(s).
-Target not created
+compiling main.c...
+..\..\Src\main.c(296): error:  #137: expression must be a modifiable lvalue
+        moduleState = Idl;
+..\..\Src\main.c(307): warning:  #111-D: statement is unreachable
+                BNO055_Error();         
+..\..\Src\main.c(319): warning:  #111-D: statement is unreachable
+                BNO055_Error();                         
+..\..\Src\main.c(334): error:  #137: expression must be a modifiable lvalue
+        moduleState = WaitID;
+..\..\Src\main.c(351): warning:  #111-D: statement is unreachable
+                BNO055_Error();
+..\..\Src\main.c(355): error:  #137: expression must be a modifiable lvalue
+        moduleState = RecieveID;
+..\..\Src\main.c(364): error:  #137: expression must be a modifiable lvalue
+        moduleState = ChangeState;
+..\..\Src\main.c(379): warning:  #111-D: statement is unreachable
+                BNO055_Error();
+..\..\Src\main.c(382): error:  #137: expression must be a modifiable lvalue
+        moduleState = StateChanged;
+..\..\Src\main.c(391): error:  #137: expression must be a modifiable lvalue
+        moduleState = WaitData;
+..\..\Src\main.c(405): warning:  #111-D: statement is unreachable
+                BNO055_Error();
+..\..\Src\main.c(408): error:  #137: expression must be a modifiable lvalue
+        moduleState = RecieveData;
+..\..\Src\main.c(418): error:  #70: incomplete type is not allowed
+        switch ( moduleState )
+..\..\Src\main.c(426): error:  #137: expression must be a modifiable lvalue
+                        moduleState = Idl;
+..\..\Src\main.c(434): error:  #137: expression must be a modifiable lvalue
+                        moduleState = Idl;
+..\..\Src\main.c(440): error:  #137: expression must be a modifiable lvalue
+                        moduleState = Idl;
+..\..\Src\main.c(416): warning:  #177-D: variable "res" was declared but never referenced
+        int8_t res;     
+..\..\Src\main.c(104): error:  #235: variable "moduleState" was declared with a never-completed type
+  enum bno055ModuleState moduleState;
+..\..\Src\main.c: 6 warnings, 12 errors
+"..\..\Src\main.c" - 12 Error(s), 6 Warning(s).
