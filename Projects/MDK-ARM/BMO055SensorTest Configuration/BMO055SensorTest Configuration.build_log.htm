@@ -4,90 +4,128 @@
 <h1>µVision Build Log</h1>
 <h2>Project:</h2>
 D:\MyPROG\LSD_SLAM\STM\BMO055SensorTest\Projects\MDK-ARM\BMO055SensorTest.uvproj
-Project File Date:  06/06/2015
+Project File Date:  06/08/2015
 
 <h2>Output:</h2>
 Build target 'BMO055SensorTest Configuration'
 compiling main.c...
-..\..\Src\main.c(322): warning:  #111-D: statement is unreachable
+..\..\Src\main.c(345): warning:  #111-D: statement is unreachable
                 BNO055_Error();         
-..\..\Src\main.c(334): warning:  #111-D: statement is unreachable
+..\..\Src\main.c(357): warning:  #111-D: statement is unreachable
                 BNO055_Error();                         
-..\..\Src\main.c(366): warning:  #111-D: statement is unreachable
+..\..\Src\main.c(389): warning:  #111-D: statement is unreachable
                 BNO055_Error();
-..\..\Src\main.c(394): warning:  #111-D: statement is unreachable
+..\..\Src\main.c(417): warning:  #111-D: statement is unreachable
                 BNO055_Error();
-..\..\Src\main.c(420): warning:  #111-D: statement is unreachable
+..\..\Src\main.c(450): warning:  #111-D: statement is unreachable
                 BNO055_Error();
-..\..\Src\main.c(431): warning:  #177-D: variable "res" was declared but never referenced
+..\..\Src\main.c(500): warning:  #177-D: variable "res" was declared but never referenced
         int8_t res;     
 ..\..\Src\main.c: 6 warnings, 0 errors
 linking...
-Program Size: Code=19284 RO-data=440 RW-data=404 ZI-data=4484  
+Program Size: Code=30492 RO-data=440 RW-data=408 ZI-data=4576  
 "BMO055SensorTest Configuration\BMO055SensorTest Configuration.axf" - 0 Error(s), 6 Warning(s).
-t Configuration.axf" - 1 Error(s), 6 Warning(s).
-Target not created
-xf" 
+Load "BMO055SensorTest Configuration\\BMO055SensorTest Configuration.axf" 
 Erase Done.
 Programming Done.
 Verify OK.
-..\..\Src\main.c(391): error:  #137: expression must be a modifiable lvalue
-        moduleState = WaitData;
-..\..\Src\main.c(405): warning:  #111-D: statement is unreachable
-                BNO055_Error();
-..\..\Src\main.c(408): error:  #137: expression must be a modifiable lvalue
-        moduleState = RecieveData;
-..\..\Src\main.c(418): error:  #70: incomplete type is not allowed
-        switch ( moduleState )
-..\..\Src\main.c(426): error:  #137: expression must be a modifiable lvalue
-                        moduleState = Idl;
-..\..\Src\main.c(434): error:  #137: expression must be a modifiable lvalue
-                        moduleState = Idl;
-..\..\Src\main.c(440): error:  #137: expression must be a modifiable lvalue
-                        moduleState = Idl;
-..\..\Src\main.c(416): warning:  #177-D: variable "res" was declared but never referenced
+</pre>
+</body>
+</html>
+c(498): warning:  #177-D: variable "res" was declared but never referenced
         int8_t res;     
-..\..\Src\main.c(104): error:  #235: variable "moduleState" was declared with a never-completed type
-  enum bno055ModuleState moduleState;
-..\..\Src\main.c: 6 warnings, 12 errors
-"BMO055SensorTest Configuration\BMO055SensorTest Configuration.axf" - 12 Error(s), 6 Warning(s).
+..\..\Src\main.c: 6 warnings, 2 errors
+"BMO055SensorTest Configuration\BMO055SensorTest Configuration.axf" - 2 Error(s), 6 Warning(s).
 Target not created
-compiling main.c...
-..\..\Src\main.c(296): error:  #137: expression must be a modifiable lvalue
-        moduleState = Idl;
-..\..\Src\main.c(307): warning:  #111-D: statement is unreachable
-                BNO055_Error();         
-..\..\Src\main.c(319): warning:  #111-D: statement is unreachable
-                BNO055_Error();                         
-..\..\Src\main.c(334): error:  #137: expression must be a modifiable lvalue
-        moduleState = WaitID;
-..\..\Src\main.c(351): warning:  #111-D: statement is unreachable
-                BNO055_Error();
-..\..\Src\main.c(355): error:  #137: expression must be a modifiable lvalue
-        moduleState = RecieveID;
-..\..\Src\main.c(364): error:  #137: expression must be a modifiable lvalue
-        moduleState = ChangeState;
-..\..\Src\main.c(379): warning:  #111-D: statement is unreachable
-                BNO055_Error();
-..\..\Src\main.c(382): error:  #137: expression must be a modifiable lvalue
-        moduleState = StateChanged;
-..\..\Src\main.c(391): error:  #137: expression must be a modifiable lvalue
-        moduleState = WaitData;
-..\..\Src\main.c(405): warning:  #111-D: statement is unreachable
-                BNO055_Error();
-..\..\Src\main.c(408): error:  #137: expression must be a modifiable lvalue
-        moduleState = RecieveData;
-..\..\Src\main.c(418): error:  #70: incomplete type is not allowed
-        switch ( moduleState )
-..\..\Src\main.c(426): error:  #137: expression must be a modifiable lvalue
-                        moduleState = Idl;
-..\..\Src\main.c(434): error:  #137: expression must be a modifiable lvalue
-                        moduleState = Idl;
-..\..\Src\main.c(440): error:  #137: expression must be a modifiable lvalue
-                        moduleState = Idl;
-..\..\Src\main.c(416): warning:  #177-D: variable "res" was declared but never referenced
+f4xx_hal_i2c.c...
+compiling stm32f4xx_hal_i2c_ex.c...
+compiling stm32f4xx_hal_pcd.c...
+compiling stm32f4xx_hal_pcd_ex.c...
+compiling stm32f4xx_hal_pwr.c...
+compiling stm32f4xx_hal_pwr_ex.c...
+compiling stm32f4xx_hal_rcc.c...
+compiling stm32f4xx_hal_rcc_ex.c...
+compiling stm32f4xx_hal_tim.c...
+compiling stm32f4xx_hal_tim_ex.c...
+compiling stm32f4xx_ll_usb.c...
+compiling stm32f4xx_hal_crc.c...
+compiling usbd_cdc.c...
+compiling usbd_core.c...
+compiling usbd_ctlreq.c...
+compiling usbd_ioreq.c...
+assembling startup_stm32f407xx.s...
+linking...
+Program Size: Code=29872 RO-data=440 RW-data=408 ZI-data=4576  
+"BMO055SensorTest Configuration\BMO055SensorTest Configuration.axf" - 0 Error(s), 6 Warning(s).
+Load "BMO055SensorTest Configuration\\BMO055SensorTest Configuration.axf" 
+Erase Done.
+Programming Done.
+Verify OK.
+Src\main.c(472): error:  #144: a value of type "double" cannot be used to initialize an entity of type "PositionDataStruct"
+        PositionDataStruct.vel.x =  4.0;        
+..\..\Src\main.c(473): error:  #40: expected an identifier
+        PositionDataStruct.vel.y =  5.0;        
+..\..\Src\main.c(473): error:  #144: a value of type "double" cannot be used to initialize an entity of type "PositionDataStruct"
+        PositionDataStruct.vel.y =  5.0;        
+..\..\Src\main.c(474): error:  #40: expected an identifier
+        PositionDataStruct.vel.z =  6.0;        
+..\..\Src\main.c(474): error:  #144: a value of type "double" cannot be used to initialize an entity of type "PositionDataStruct"
+        PositionDataStruct.vel.z =  6.0;        
+..\..\Src\main.c(476): error:  #40: expected an identifier
+        PositionDataStruct.pos.x =  7.0;        
+..\..\Src\main.c(476): error:  #144: a value of type "double" cannot be used to initialize an entity of type "PositionDataStruct"
+        PositionDataStruct.pos.x =  7.0;        
+..\..\Src\main.c(477): error:  #40: expected an identifier
+        PositionDataStruct.pos.y =  8.0;        
+..\..\Src\main.c(477): error:  #144: a value of type "double" cannot be used to initialize an entity of type "PositionDataStruct"
+        PositionDataStruct.pos.y =  8.0;        
+..\..\Src\main.c(478): error:  #40: expected an identifier
+        PositionDataStruct.pos.z =  9.0;
+..\..\Src\main.c(478): error:  #144: a value of type "double" cannot be used to initialize an entity of type "PositionDataStruct"
+        PositionDataStruct.pos.z =  9.0;
+..\..\Src\main.c(481): error:  #20: identifier "res" is undefined
+        res = CDC_Transmit_FS( (uint8_t*)PositionDataStruct, sizeof(PositionDataStruct) );      
+..\..\Src\main.c(481): error:  #254: type name is not allowed
+        res = CDC_Transmit_FS( (uint8_t*)PositionDataStruct, sizeof(PositionDataStruct) );      
+..\..\Src\main.c(487): warning:  #177-D: variable "res" was declared but never referenced
         int8_t res;     
-..\..\Src\main.c(104): error:  #235: variable "moduleState" was declared with a never-completed type
-  enum bno055ModuleState moduleState;
-..\..\Src\main.c: 6 warnings, 12 errors
-"..\..\Src\main.c" - 12 Error(s), 6 Warning(s).
+..\..\Src\main.c: 6 warnings, 24 errors
+"BMO055SensorTest Configuration\BMO055SensorTest Configuration.axf" - 24 Error(s), 6 Warning(s).
+Target not created
+d_cdc_if.c...
+compiling usbd_conf.c...
+compiling usbd_desc.c...
+compiling crc.c...
+compiling dma.c...
+compiling system_stm32f4xx.c...
+compiling stm32f4xx_hal.c...
+compiling stm32f4xx_hal_cortex.c...
+compiling stm32f4xx_hal_dma.c...
+compiling stm32f4xx_hal_dma_ex.c...
+compiling stm32f4xx_hal_flash.c...
+compiling stm32f4xx_hal_flash_ex.c...
+compiling stm32f4xx_hal_flash_ramfunc.c...
+compiling stm32f4xx_hal_gpio.c...
+compiling stm32f4xx_hal_i2c.c...
+compiling stm32f4xx_hal_i2c_ex.c...
+compiling stm32f4xx_hal_pcd.c...
+compiling stm32f4xx_hal_pcd_ex.c...
+compiling stm32f4xx_hal_pwr.c...
+compiling stm32f4xx_hal_pwr_ex.c...
+compiling stm32f4xx_hal_rcc.c...
+compiling stm32f4xx_hal_rcc_ex.c...
+compiling stm32f4xx_hal_tim.c...
+compiling stm32f4xx_hal_tim_ex.c...
+compiling stm32f4xx_ll_usb.c...
+compiling stm32f4xx_hal_crc.c...
+compiling usbd_cdc.c...
+compiling usbd_core.c...
+compiling usbd_ctlreq.c...
+compiling usbd_ioreq.c...
+assembling startup_stm32f407xx.s...
+"BMO055SensorTest Configuration\BMO055SensorTest Configuration.axf" - 24 Error(s), 6 Warning(s).
+Target not created
+Load "BMO055SensorTest Configuration\\BMO055SensorTest Configuration.axf" 
+Erase Done.
+Programming Done.
+Verify OK.

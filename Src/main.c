@@ -114,43 +114,59 @@ struct
 	uint8_t		pageID;				// Идентификатор текущей страници
 }bno055IDStruct;
 
-// Данные датчиков--------------------------------------
+// Структура целочичисленного вектора ------------------
+typedef struct VECTOR_3DI_Struct
+{
+	int16_t		x;
+	int16_t		y;
+	int16_t		z;
+}iVector3D;
+
+// Структура вектора с пдавающей запятой -----------------
+typedef struct VECTOR_3DD_Struct
+{
+	double		x;
+	double		y;
+	double		z;
+}dVector3D;
+
+// Структура кватерниона  с пдавающей запятой  -----------
+typedef struct QUATERNION_I_Struct
+{
+	int16_t		quaW;
+	int16_t		quaX;
+	int16_t		quaY;	
+	int16_t		quaZ;
+}iQuternion;
+
+// Структура целочичисленного кватерниона ----------------
+typedef struct QUATERNION_D_Struct
+{
+	double		quaW;
+	double		quaX;
+	double		quaY;	
+	double		quaZ;
+}dQuternion;
+
+// Данные датчиков---------------------------------------
 typedef struct bno055SensorsDataStruct
 {
-	// Ускорение по осям
-	int16_t		accX;
-	int16_t		accY;
-	int16_t		accZ;
-	// Днные магнитометра
-	int16_t		magX;
-	int16_t		magY;
-	int16_t		magZ;
-	// Днные гироскопа
-	int16_t		giroX;
-	int16_t		giroY;
-	int16_t		giroZ;
+	iVector3D acc;				// Ускорение по осям
+	iVector3D	mag;				// Днные магнитометра
+	iVector3D	giro;				// Днные гироскопа
 }bno055SensorsData;
 
 // Обработанные данные ---------------------------------
 typedef struct bno055FusionDataStruct
 {
 	// Днные абсолютной ориентации
-	int16_t		head;
-	int16_t		roll;
-	int16_t		pitch;	
-	// Кватернион
-	int16_t		quaW;
-	int16_t		quaX;
-	int16_t		quaY;	
-	int16_t		quaZ;
-	// Линенйое ускорение
-	int16_t		linX;
-	int16_t		linY;
-	int16_t		linZ;
-	// Чистая гаымтация
-	int16_t		grvX;
-	int16_t		grvY;
-	int16_t		grvZ;
+	int16_t			head;
+	int16_t			roll;
+	int16_t			pitch;
+	
+	iQuternion 	qua;		// Кватернион
+	iVector3D		lin;		// Линенйое ускорение
+	iVector3D		grv;		// Чистая гавитация
 }bno055FusionData;
 // Экземпляр данных
 bno055FusionData fusionData;
@@ -176,18 +192,23 @@ struct BNO055_All_Data_Struct
 // Структура данных для передачи на ПК -----------------
 typedef struct Positon_Data_Struct
 {
-	// Кватернион
-	int16_t		quaW;
-	int16_t		quaX;
-	int16_t		quaY;	
-	int16_t		quaZ;
+	uint16_t			code;		// Код струтуры
 	
-	double		posX;		
-	double		posY;
-	double		posZ;	
+	iQuternion 	qua;		// Ориентация
+	
+	dVector3D		acc;		// Текущее ускорение
+	dVector3D		vel;		// Оценка текущей скорости	
+	dVector3D		pos;		// Оценка тукцщкго положения
 }PositionDataStruct;
 // Экземпляр данных
 PositionDataStruct globalPostionData;
+// Размер структуры данных
+uint16_t globalPostionDataSize = sizeof( PositionDataStruct );
+
+// Количество циклов между отправкой
+#define USB_DATA_TRANSMIT_CICLE_NUMBER 500
+// Счетчик циклов
+uint16_t	usbDataTransmitCounter = 0;
 
 // Инициализацтя модуля
 void initBNO055( void );
@@ -198,6 +219,8 @@ void changeState( void );
 
 // Функция обработки полученных данных
 void processData( void );
+// Рачсчет значений
+void calculatePosition( void );
 
 // Функция запроса данных
 void recieveData( void );
@@ -386,7 +409,7 @@ void changeState()
 																				I2C_MEMADD_SIZE_8BIT, 			// Размерность данных
 																				&data, 											// Буфер отправляемых данных 
 																				sizeof(data),								// Сколько данных отправить
-																				100);
+																				100	);
 	
 	if( HAL_OK != halStatus )
 	{
@@ -402,27 +425,73 @@ void changeState()
 // Функция запроса данных
 void recieveData(  )
 {
+	if( moduleState != Idl )
+	{
+		// while(1){}
+		// Тут можно поставить счетчик пропущенных циклов
+		return;
+	}
+	
 	// Поменять состояние 
 	moduleState = WaitData;
 
-	// Пробуем поменять режим устройства	
-	halStatus = HAL_I2C_Mem_Read( 				&hi2c1, 
+	// Зпрашиваем новые данные
+	halStatus = HAL_I2C_Mem_Read_DMA( 		&hi2c1, 
 															(uint16_t)BNO055_DEVICE_ADDRESS,			// Адрес устройства
 																				0x1A, 											// Адрес регистра
 																				I2C_MEMADD_SIZE_8BIT, 			// Размерность данных
 																				(uint8_t*)&fusionData,			// Буфер для получения данных
-																				sizeof(fusionData), 				// Сколько данных нужно отправить
-																				100);
-	
+																				sizeof(fusionData) 					// Сколько данных нужно отправить
+																				);
+	// Обработать ошибки
 	if( HAL_OK != halStatus )
 	{
 		while (1){}
 		BNO055_Error();
 	}	
-	// Поменять состояние 
-	moduleState = RecieveData;
-	// Функция обработки полученных данных
-	processData();
+}
+
+// Рачсчет значений
+void calculatePosition()
+{
+	// Полная инициализация
+	globalPostionData.code  = 	0xAA;
+	
+	globalPostionData.qua   = 	fusionData.qua;
+	
+//	globalPostionData.acc.x =  fusionData.lin.x / 100.0;	
+//	globalPostionData.acc.y =  fusionData.lin.y / 100.0;	
+//	globalPostionData.acc.z =  fusionData.lin.z / 100.0;	
+//		
+//	globalPostionData.vel.x =  globalPostionData.acc.x / 100.0;	
+//	globalPostionData.vel.y =  globalPostionData.acc.y / 100.0;	
+//	globalPostionData.vel.z =  globalPostionData.acc.z / 100.0;	
+//	
+//	globalPostionData.pos.x =  globalPostionData.vel.x / 100.0;	
+//	globalPostionData.pos.y =  globalPostionData.vel.y / 100.0;	
+//	globalPostionData.pos.z =  globalPostionData.vel.z / 100.0;
+	
+	globalPostionData.acc.x =	1.0;		
+	globalPostionData.acc.y =	2.0;		
+	globalPostionData.acc.z =	3.0;	
+	
+	globalPostionData.vel.x =  4.0;	
+	globalPostionData.vel.y =  5.0;	
+	globalPostionData.vel.z =  6.0;	
+	
+	globalPostionData.pos.x =  7.0;	
+	globalPostionData.pos.y =  8.0;	
+	globalPostionData.pos.z =  9.0;
+	
+	if( usbDataTransmitCounter++ >= USB_DATA_TRANSMIT_CICLE_NUMBER )
+	{
+		HAL_GPIO_TogglePin ( GPIOD, GPIO_PIN_13 );
+		
+		// Отправить пакет по USB
+		uint8_t res = CDC_Transmit_FS( (uint8_t*)&globalPostionData, sizeof(PositionDataStruct) );	
+		// Сбросить счетчик
+		usbDataTransmitCounter = 0;
+	}
 }
 
 // Функция обработки полученных данных
@@ -444,7 +513,8 @@ void processData( void )
 						
 		// Получить ID устройства
 		case RecieveData:
-			///printf("case RecieveData");
+			// Рачсчет новых значений
+			calculatePosition();
 			// Отправить пакет по USB
 			// res = CDC_Transmit_FS( (uint8_t*)testDataToSend, 2*8 );
 			// Поменять сосояние
@@ -467,10 +537,15 @@ void processData( void )
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
 	// Меняем состояние на противоположное
-	HAL_GPIO_TogglePin ( GPIOD, GPIO_PIN_13 );
+	//HAL_GPIO_TogglePin ( GPIOD, GPIO_PIN_13 );
+	//HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET);
 	
 	// Запросить данные
 	recieveData();
+	
+	// Меняем состояние на противоположное
+	//HAL_GPIO_TogglePin ( GPIOD, GPIO_PIN_13 );
+	// HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET);
 }
 
 void BNO055_Error()
@@ -489,7 +564,16 @@ void HAL_I2C_MemTxCpltCallback ( I2C_HandleTypeDef *hi2c )
 // Прерывание по окончантю приема
 void HAL_I2C_MemRxCpltCallback ( I2C_HandleTypeDef *hi2c )
 {
-
+	// Если ждем данные
+	if( moduleState == WaitData )
+	{
+		// Указать состоянее данные получены
+		 moduleState = RecieveData;		
+	}
+	else
+	{
+		while(1){}
+	}
 }
 
 /* USER CODE END 4 */

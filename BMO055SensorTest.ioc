@@ -1,5 +1,5 @@
 #MicroXplorer Configuration settings - do not modify
-#Sat Jun 06 19:36:38 CEST 2015
+#Mon Jun 08 22:40:41 CEST 2015
 Dma.I2C1_RX.1.Channel=DMA_CHANNEL_1
 Dma.I2C1_RX.1.Direction=DMA_PERIPH_TO_MEMORY
 Dma.I2C1_RX.1.FIFOMode=DMA_FIFOMODE_DISABLE
@@ -26,6 +26,8 @@ Dma.Request0=I2C1_TX
 Dma.Request1=I2C1_RX
 Dma.RequestsNb=2
 File.Version=4
+I2C1.ClockSpeed=400000
+I2C1.IPParameters=ClockSpeed
 KeepUserPlacement=false
 Mcu.Family=STM32F4
 Mcu.IP0=CRC
@@ -62,7 +64,7 @@ NVIC.I2C1_EV_IRQn=true\:3\:0
 NVIC.OTG_FS_IRQn=true\:0\:0
 NVIC.PriorityGroup=NVIC_PRIORITYGROUP_2
 NVIC.SysTick_IRQn=true\:0\:0
-NVIC.TIM7_IRQn=true\:3\:0
+NVIC.TIM7_IRQn=true\:0\:0
 PA11.GPIOParameters=GPIO_Speed,GPIO_PuPd,GPIO_Mode
 PA11.GPIO_Mode=GPIO_MODE_AF_PP
 PA11.GPIO_PuPd=GPIO_NOPULL
@@ -165,8 +167,8 @@ RCC.PLLQ=7
 RCC.SYSCLKSource=RCC_SYSCLKSOURCE_PLLCLK
 RCC.VcooutputI2S=96000000
 TIM7.IPParameters=Prescaler,Period
-TIM7.Period=62499
-TIM7.Prescaler=671
+TIM7.Period=59999
+TIM7.Prescaler=13
 USB_DEVICE.IPParameters=VirtualModeFS,USBD_HandleTypeDef,VirtualMode
 USB_DEVICE.USBD_HandleTypeDef=hUsbDeviceFS
 USB_DEVICE.VirtualMode=Cdc
